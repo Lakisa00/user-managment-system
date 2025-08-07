@@ -26,14 +26,34 @@ create table if not exists books(
 conn.commit()
 
 def add_book(title, author, year):
-    pass
-
+    try:
+        cursor.execute("insert into books (title, author, year) values (%s,%s,%s)",(title,author,year))
+        conn.commit()
+        print(f"Book {title} Added Succesfully")
+    except mysql.connector.Error as err:
+        print(f"Error: {err}")
+        
 def list_books():
-    pass
-
+    cursor.execute('select * from books')
+    rows = cursor.fetchall()
+    if not rows:
+        print("No books found")
+        return
+    print("\n--- Book ---")
+    for row in rows:
+        status = "Available" if row[4] else "Borrowed"
+        print(f"ID: {row[0]} | {row[1]} by {row[2]} ({row[3]}) - {status}")
+        
 def search_books(keyword):
-    pass
-
+    cursor.execute("select * from books where title like %s", (f"%{keyword}%"))
+    rows = cursor.fetchall()
+    if not rows:
+        print(f"No books found with title containing '{keyword}'.")
+        return
+    print("\n--- Search Results ---")
+    for row in rows:
+        status = "Available" if row[4] else "Borrowed"
+        print(f"ID: {row[0]} | {row[1]} by {row[2]} ({row[3]}) - {status}")
 def borrow_book(book_id):
     pass
 
@@ -41,7 +61,12 @@ def return_book(book_id):
     pass
 
 def delete_book(book_id):
-    pass
+    cursor.execute('delete from users where book_id = %s', (book_id))
+    conn.commit()
+    if cursor.rowcount == 0:
+        print(f'No bookd Found with ID {book_id}')
+    else:
+        print(f'Book with ID {book_id} has been Deleted')
 
 while True:
     print("1: Add Book")
