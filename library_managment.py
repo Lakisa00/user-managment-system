@@ -80,8 +80,9 @@ def return_book(book_id):
     cursor.execute("update books set available = true where id = %s",(book_id,))
     conn.commit()
     print(f'Book ID {book_id} returned')
+    
 def delete_book(book_id):
-    cursor.execute('delete from users where book_id = %s', (book_id,))
+    cursor.execute('delete from books where id = %s', (book_id,))
     conn.commit()
     if cursor.rowcount == 0:
         print(f'No bookd Found with ID {book_id}')
