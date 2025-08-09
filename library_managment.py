@@ -45,7 +45,7 @@ def list_books():
         print(f"ID: {row[0]} | {row[1]} by {row[2]} ({row[3]}) - {status}")
         
 def search_books(keyword):
-    cursor.execute("select * from books where title like %s", (f"%{keyword}%"))
+    cursor.execute("select * from books where title like %s", (f"%{keyword}%",))
     rows = cursor.fetchall()
     if not rows:
         print(f"No books found with title containing '{keyword}'.")
@@ -54,6 +54,7 @@ def search_books(keyword):
     for row in rows:
         status = "Available" if row[4] else "Borrowed"
         print(f"ID: {row[0]} | {row[1]} by {row[2]} ({row[3]}) - {status}")
+        
 def borrow_book(book_id):
     cursor.execute("select available from books where id = %s",(book_id,))
     row = cursor.fetchone()
@@ -66,8 +67,9 @@ def borrow_book(book_id):
     cursor.execute("update books set available = false where id = %s",(book_id,))
     conn.commit()
     print(f"Book ID {book_id} borrowed")
+    
 def return_book(book_id):
-    cursor.execute("select available from books where id = %s",(book_id))
+    cursor.execute("select available from books where id = %s",(book_id,))
     row = cursor.fetchone()
     if not row:
         print("Book not found")
@@ -79,7 +81,7 @@ def return_book(book_id):
     conn.commit()
     print(f'Book ID {book_id} returned')
 def delete_book(book_id):
-    cursor.execute('delete from users where book_id = %s', (book_id))
+    cursor.execute('delete from users where book_id = %s', (book_id,))
     conn.commit()
     if cursor.rowcount == 0:
         print(f'No bookd Found with ID {book_id}')
