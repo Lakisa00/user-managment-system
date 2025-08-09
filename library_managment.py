@@ -55,11 +55,29 @@ def search_books(keyword):
         status = "Available" if row[4] else "Borrowed"
         print(f"ID: {row[0]} | {row[1]} by {row[2]} ({row[3]}) - {status}")
 def borrow_book(book_id):
-    pass
-
+    cursor.execute("select available from books where id = %s",(book_id,))
+    row = cursor.fetchone()
+    if not row:
+        print("Book is not found")
+        return
+    if not row[0]:
+        print("Book is already borrowed")
+        return
+    cursor.execute("update books set available = false where id = %s",(book_id,))
+    conn.commit()
+    print(f"Book ID {book_id} borrowed")
 def return_book(book_id):
-    pass
-
+    cursor.execute("select available from books where id = %s",(book_id))
+    row = cursor.fetchone()
+    if not row:
+        print("Book not found")
+        return
+    if row[0]:
+        print("Book is already available")
+        return
+    cursor.execute("update books set available = true where id = %s",(book_id,))
+    conn.commit()
+    print(f'Book ID {book_id} returned')
 def delete_book(book_id):
     cursor.execute('delete from users where book_id = %s', (book_id))
     conn.commit()
